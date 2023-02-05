@@ -13,11 +13,11 @@ namespace EBD.API.Domain
 
             htmlDoc.LoadHtml(html);
 
-            var lessonsElements = htmlDoc.DocumentNode.SelectNodes("//p/a");
+            var lessonsElements = htmlDoc.DocumentNode.SelectNodes("//p/*");
 
             foreach (var lessonElement in lessonsElements)
             {
-                if (lessonElement.FirstChild.Name != "#text")
+                if (lessonElement.Name == "a" && lessonElement.FirstChild.Name != "#text")
                 {
                     var lessonSplit = lessonElement.InnerText.Split(":");
                     var lesson = new Lesson()
@@ -28,6 +28,18 @@ namespace EBD.API.Domain
 
                     lessons.Add(lesson);
                     if (lessonSplit[0].Contains("13"))
+                        break;
+                }
+                else if(lessonElement.Name == "strong")
+                {
+                    var lesson = new Lesson()
+                    {
+                        LessonNumber = lessonElement.InnerText,
+                        LessonName = lessonElement.NextSibling.InnerText
+                    };
+
+                    lessons.Add(lesson);
+                    if (lessonElement.InnerText.Contains("13"))
                         break;
                 }
             }
